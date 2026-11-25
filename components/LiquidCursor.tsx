@@ -39,11 +39,11 @@ export default function LiquidCursor() {
       >
         <motion.div
           style={{ x: fastX, y: fastY }}
-          className="absolute -left-4 -top-4 h-8 w-8 rounded-full bg-cyan-400"
+          className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-cyan-400"
         />
         <motion.div
           style={{ x: slowX, y: slowY }}
-          className="absolute -left-8 -top-8 h-16 w-16 rounded-full bg-fuchsia-500/80"
+          className="absolute -left-5 -top-5 h-10 w-10 rounded-full bg-fuchsia-500/60"
         />
       </div>
     </>
