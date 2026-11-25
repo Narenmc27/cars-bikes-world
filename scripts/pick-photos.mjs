@@ -24,7 +24,16 @@ const showAll = args.includes("--all");
 const nameIdx = args.indexOf("--name");
 const onlyName = nameIdx >= 0 ? args[nameIdx + 1] : null;
 
-const clean = (s = "") => s.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+const clean = (s = "") =>
+  s
+    .replace(/<[^>]*>/g, "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 

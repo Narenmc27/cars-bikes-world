@@ -13,7 +13,16 @@ const HEADERS = {
 // Allowed licenses only (no NC / ND)
 const OK_LICENSE = /^(CC BY(-SA)?[ -]\d|CC0|Public domain|PD)/i;
 
-const clean = (s = "") => s.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+const clean = (s = "") =>
+  s
+    .replace(/<[^>]*>/g, "")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
