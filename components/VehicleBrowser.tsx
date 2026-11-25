@@ -1,7 +1,9 @@
 "use client";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Vehicle } from "../lib/types";
+import { slugify } from "../lib/slug";
 
 const TYPES = ["All", "Car", "Bike"] as const;
 
@@ -36,7 +38,6 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
 
   return (
     <section className="mx-auto max-w-6xl px-6 pb-32">
-      {/* Search + filters */}
       <div className="sticky top-4 z-40 mb-8 flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl md:flex-row md:items-center">
         <input
           value={query}
@@ -78,7 +79,6 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
         Showing {filtered.length} of {vehicles.length} vehicles
       </p>
 
-      {/* Cards */}
       <motion.div
         layout
         className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6"
@@ -93,32 +93,38 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
               exit={{ opacity: 0, scale: 0.9 }}
               whileHover={{ y: -8 }}
               transition={{ type: "spring", stiffness: 260, damping: 30 }}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur hover:border-cyan-300/50"
+              className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur hover:border-cyan-300/50"
             >
-              {v.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={v.image_url}
-                  alt={v.name}
-                  loading="lazy"
-                  className="mb-6 h-40 w-full rounded-xl object-cover"
-                />
-              ) : (
-                <div className="mb-6 h-40 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
-              )}
-              <p className="text-sm text-cyan-300">
-                {v.type} · {v.year}
-              </p>
-              <h3 className="mt-1 text-xl font-semibold">{v.name}</h3>
-              <p className="text-white/50">{v.country}</p>
-              {v.story && (
-                <p className="mt-3 text-sm leading-relaxed text-white/60">
-                  {v.story}
+              <Link
+                href={`/vehicles/${slugify(v.name)}`}
+                className="block cursor-pointer p-6"
+              >
+                {v.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={v.image_url}
+                    alt={v.name}
+                    loading="lazy"
+                    className="mb-6 h-40 w-full rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="mb-6 h-40 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
+                )}
+                <p className="text-sm text-cyan-300">
+                  {v.type} · {v.year}
                 </p>
-              )}
-              {v.image_credit && (
-                <p className="mt-3 text-xs text-white/30">{v.image_credit}</p>
-              )}
+                <h3 className="mt-1 text-xl font-semibold">{v.name}</h3>
+                <p className="text-white/50">{v.country}</p>
+                {v.story && (
+                  <p className="mt-3 text-sm leading-relaxed text-white/60">
+                    {v.story}
+                  </p>
+                )}
+                {v.image_credit && (
+                  <p className="mt-3 text-xs text-white/30">{v.image_credit}</p>
+                )}
+                <p className="mt-4 text-sm text-cyan-300">View details →</p>
+              </Link>
             </motion.div>
           ))}
         </AnimatePresence>
