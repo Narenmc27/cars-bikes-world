@@ -1,15 +1,26 @@
 import Reveal from "../components/Reveal";
+import { supabase } from "../lib/supabase";
+import { cacheLife } from "next/cache";
 
-const vehicles = [
-  { name: "Ford Model T", type: "Car", year: 1908, country: "USA" },
-  { name: "Royal Enfield Bullet", type: "Bike", year: 1932, country: "UK / India" },
-  { name: "Hindustan Ambassador", type: "Car", year: 1958, country: "India" },
-  { name: "Honda CB750", type: "Bike", year: 1969, country: "Japan" },
-  { name: "Yamaha RX100", type: "Bike", year: 1985, country: "Japan / India" },
-  { name: "Ferrari F40", type: "Car", year: 1987, country: "Italy" },
-];
+type Vehicle = {
+  id: number;
+  name: string;
+  type: string;
+  year: number;
+  country: string;
+  story: string | null;
+  image_url: string | null;
+  image_credit: string | null;
+};
 
-export default function Home() {
+export default async function Home() {
+  "use cache";
+  cacheLife("minutes");
+
+  const { data, error } = await supabase.from("vehicles").select("*").order("year");
+  if (error) console.error("Supabase error:", error.message);
+  const vehicles = (data ?? []) as Vehicle[];
+
   return (
     <main>
       <section className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
@@ -33,14 +44,29 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-6 pb-32">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-6">
           {vehicles.map((v, i) => (
-            <Reveal key={v.name} delay={(i % 3) * 0.1}>
+            <Reveal key={v.id} delay={(i % 3) * 0.1}>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur transition-transform duration-500 hover:-translate-y-2 hover:border-cyan-300/50">
-                <div className="mb-6 h-40 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
+                {v.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={v.image_url}
+                    alt={v.name}
+                    className="mb-6 h-40 w-full rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="mb-6 h-40 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
+                )}
                 <p className="text-sm text-cyan-300">
                   {v.type} · {v.year}
                 </p>
                 <h3 className="mt-1 text-xl font-semibold">{v.name}</h3>
                 <p className="text-white/50">{v.country}</p>
+                {v.story && (
+                  <p className="mt-3 text-sm leading-relaxed text-white/60">{v.story}</p>
+                )}
+                {v.image_credit && (
+                  <p className="mt-3 text-xs text-white/30">{v.image_credit}</p>
+                )}
               </div>
             </Reveal>
           ))}
