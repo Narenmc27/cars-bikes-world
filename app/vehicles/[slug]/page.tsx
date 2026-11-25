@@ -4,6 +4,39 @@ import { Suspense } from "react";
 import Reveal from "../../../components/Reveal";
 import { getVehicles, getVehicleBySlug } from "../../../lib/vehicles";
 import { slugify } from "../../../lib/slug";
+import type { Metadata } from "next";
+
+export async function generateStaticParams() {
+  const all = await getVehicles();
+  return all.map((v) => ({ slug: slugify(v.name) }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const v = await getVehicleBySlug(slug);
+  if (!v) return { title: "Not found" };
+
+  const description =
+    v.story ?? `${v.name} (${v.year}${v.country ? ", " + v.country : ""})`;
+
+  return {
+    title: v.name,
+    description,
+    openGraph: {
+      title: v.name,
+      description,
+      images: v.image_url ? [{ url: v.image_url }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: v.image_url ? [v.image_url] : undefined,
+    },
+  };
+}
 
 export default function VehiclePage({
   params,

@@ -5,8 +5,19 @@ import LiquidBackground from "../components/LiquidBackground";
 import LiquidCursor from "../components/LiquidCursor";
 
 export const metadata: Metadata = {
-  title: "Cars & Bikes World",
+  metadataBase: new URL("https://cars-bikes-world.vercel.app"),
+  title: {
+    default: "Cars & Bikes World",
+    template: "%s | Cars & Bikes World",
+  },
   description: "A fluid encyclopedia of every car and bike ever made.",
+  openGraph: {
+    title: "Cars & Bikes World",
+    description: "A fluid encyclopedia of every car and bike ever made.",
+    siteName: "Cars & Bikes World",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
