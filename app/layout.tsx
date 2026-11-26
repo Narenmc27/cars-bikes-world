@@ -3,6 +3,7 @@ import "./globals.css";
 import SmoothScroll from "../components/SmoothScroll";
 import LiquidBackground from "../components/LiquidBackground";
 import LiquidCursor from "../components/LiquidCursor";
+import GarageChat from "../components/GarageChat";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cars-bikes-world.vercel.app"),
@@ -30,6 +31,7 @@ export default function RootLayout({
           <LiquidBackground />
           <LiquidCursor />
           {children}
+          <GarageChat />
         </SmoothScroll>
       </body>
     </html>
