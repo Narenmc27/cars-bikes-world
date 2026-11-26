@@ -23,6 +23,11 @@ const args = process.argv.slice(2);
 const showAll = args.includes("--all");
 const nameIdx = args.indexOf("--name");
 const onlyName = nameIdx >= 0 ? args[nameIdx + 1] : null;
+const namesIdx = args.indexOf("--names");
+const onlyNames =
+  namesIdx >= 0
+    ? args[namesIdx + 1].split(",").map((s) => s.trim()).filter(Boolean)
+    : null;
 
 const clean = (s = "") =>
   s
@@ -39,7 +44,8 @@ const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 async function loadVehicles() {
   let q = supabase.from("vehicles").select("id, name, image_url").order("year");
-  if (onlyName) q = q.eq("name", onlyName);
+  if (onlyNames) q = q.in("name", onlyNames);
+  else if (onlyName) q = q.eq("name", onlyName);
   else if (!showAll) q = q.is("image_url", null);
   const { data, error } = await q;
   if (error) throw error;
