@@ -9,7 +9,8 @@ const rows: { label: string; get: (v: Vehicle) => string }[] = [
   { label: "Type", get: (v) => v.type },
   { label: "Year", get: (v) => String(v.year) },
   { label: "Country", get: (v) => v.country ?? "Unknown" },
-  { label: "Era", get: (v) => `${Math.floor(v.year / 10) * 10}s` },
+  { label: "Decade", get: (v) => `${Math.floor(v.year / 10) * 10}s` },
+  { label: "Story", get: (v) => v.story ?? "-" },
 ];
 
 export default function CompareModal({
@@ -39,7 +40,7 @@ export default function CompareModal({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[45] flex items-center justify-center bg-black/70 p-4 backdrop-blur-md"
+      className="fixed inset-0 z-[45] flex items-center justify-center bg-brg-deep/85 p-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -47,71 +48,82 @@ export default function CompareModal({
     >
       <motion.div
         data-lenis-prevent
-        className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-[#0b0d14] p-6"
-        initial={{ opacity: 0, y: 40, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 40, scale: 0.96 }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Compare vehicles"
+        className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto border-2 border-ink bg-bone p-5 text-ink shadow-[8px_8px_0_#0b1a16] md:p-8"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
         transition={{ type: "spring", stiffness: 260, damping: 28 }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/80 transition hover:bg-white/20"
+          className="absolute right-3 top-3 h-9 w-9 border-2 border-ink bg-bone font-bold hover:bg-mustard/50"
         >
           ✕
         </button>
 
-        <h2 className="mb-6 text-center text-2xl font-semibold">Compare</h2>
+        <h2 className="font-display text-3xl">Side by side</h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          {[a, b].map((v) => (
-            <div key={v.id} className="text-center">
-              {v.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={v.image_url}
-                  alt={v.name}
-                  className="h-36 w-full rounded-xl object-cover md:h-48"
-                />
-              ) : (
-                <div className="h-36 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30 md:h-48" />
-              )}
-              <h3 className="mt-3 text-lg font-semibold">{v.name}</h3>
-              <Link
-                href={`/vehicles/${slugify(v.name)}`}
-                className="text-sm text-cyan-300"
-              >
-                View details →
-              </Link>
-            </div>
-          ))}
-        </div>
+        <table className="mt-6 w-full table-fixed border-collapse border-2 border-ink text-left">
+          <thead>
+            <tr className="border-b-2 border-ink align-top">
+              <td className="w-1/4 border-r-2 border-ink bg-mustard/60" />
+              {[a, b].map((v, i) => (
+                <th
+                  key={v.id}
+                  scope="col"
+                  className={`p-3 font-normal ${i === 0 ? "border-r-2 border-ink" : ""}`}
+                >
+                  {v.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={v.image_url}
+                      alt={v.name}
+                      className="h-24 w-full border-4 border-white object-cover md:h-36"
+                    />
+                  ) : (
+                    <div className="flex h-24 w-full items-center justify-center border-4 border-white bg-chrome/50 text-sm text-ink/60 md:h-36">
+                      No photo yet
+                    </div>
+                  )}
+                  <p className="mt-2 font-display text-base leading-tight md:text-xl">
+                    {v.name}
+                  </p>
+                  <Link
+                    href={`/vehicles/${slugify(v.name)}`}
+                    className="mt-1 inline-block text-sm font-bold text-enamel underline underline-offset-4"
+                  >
+                    Read the full card
+                  </Link>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.label} className="border-b-2 border-ink last:border-b-0">
+                <th
+                  scope="row"
+                  className="border-r-2 border-ink bg-mustard/60 px-3 py-2 align-top font-bold"
+                >
+                  {r.label}
+                </th>
+                <td className="border-r-2 border-ink px-3 py-2 align-top text-sm md:text-base">
+                  {r.get(a)}
+                </td>
+                <td className="px-3 py-2 align-top text-sm md:text-base">
+                  {r.get(b)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-        <div className="mt-6 divide-y divide-white/10 rounded-2xl border border-white/10">
-          {rows.map((r) => (
-            <div key={r.label} className="px-4 py-3">
-              <p className="text-center text-xs uppercase tracking-widest text-white/40">
-                {r.label}
-              </p>
-              <div className="mt-1 grid grid-cols-2 gap-4 text-center font-semibold">
-                <p>{r.get(a)}</p>
-                <p>{r.get(b)}</p>
-              </div>
-            </div>
-          ))}
-          <div className="px-4 py-3">
-            <p className="text-center text-xs uppercase tracking-widest text-white/40">
-              Story
-            </p>
-            <div className="mt-1 grid grid-cols-2 gap-4 text-center text-sm text-white/60">
-              <p>{a.story ?? "-"}</p>
-              <p>{b.story ?? "-"}</p>
-            </div>
-          </div>
-        </div>
-
-        <p className="mt-6 text-center text-white/70">{summary}</p>
+        <p className="mt-6 bg-mustard px-4 py-3 font-bold">{summary}</p>
       </motion.div>
     </motion.div>
   );

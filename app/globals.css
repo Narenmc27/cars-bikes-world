@@ -1,6 +1,46 @@
 @import "tailwindcss";
 
+@theme inline {
+  --font-display: var(--font-alfa), Georgia, serif;
+  --font-body: var(--font-courier), "Courier New", monospace;
+
+  --color-brg: #17302a;
+  --color-brg-deep: #0f211c;
+  --color-bone: #ece3cb;
+  --color-ink: #1a1510;
+  --color-enamel: #c8392b;
+  --color-mustard: #e2a82a;
+  --color-chrome: #b9c4bd;
+}
+
+html {
+  background: #17302a;
+}
+
+/* Green pegboard wall */
 body {
-  background: #05060a;
-  color: #fff;
+  background-color: #17302a;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.25) 2px, transparent 2.5px);
+  background-size: 28px 28px;
+  color: #ece3cb;
+  line-height: 1.6;
+}
+
+/* Checkered garage floor strip */
+.checker {
+  height: 24px;
+  background: repeating-conic-gradient(#14110f 0% 25%, #ece3cb 0% 50%) 0 0 / 48px 48px;
+}
+
+/* Hanging chain */
+.chain {
+  background: repeating-linear-gradient(to bottom, #b9c4bd 0 8px, #6f7b75 8px 12px);
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }

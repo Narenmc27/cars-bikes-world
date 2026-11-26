@@ -1,10 +1,9 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import Reveal from "../../../components/Reveal";
 import { getVehicles, getVehicleBySlug } from "../../../lib/vehicles";
 import { slugify } from "../../../lib/slug";
-import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   const all = await getVehicles();
@@ -72,92 +71,98 @@ async function VehicleDetail({
     { label: "Year", value: String(vehicle.year) },
     { label: "Country", value: vehicle.country ?? "Unknown" },
     { label: "Type", value: vehicle.type },
-    { label: "Era", value: `${Math.floor(vehicle.year / 10) * 10}s` },
+    { label: "Decade", value: `${Math.floor(vehicle.year / 10) * 10}s` },
   ];
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <Link
-        href="/"
-        className="inline-block text-sm text-cyan-300 transition hover:-translate-x-1"
-      >
-        ← Back to all vehicles
-      </Link>
+    <main className="px-4 py-10 md:px-6">
+      <div className="mx-auto max-w-4xl">
+        <Link
+          href="/"
+          className="inline-block font-bold text-bone underline underline-offset-4 hover:text-mustard"
+        >
+          Back to the garage
+        </Link>
 
-      <Reveal>
-        <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-          {vehicle.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={vehicle.image_url}
-              alt={vehicle.name}
-              className="max-h-[70vh] w-full object-cover"
-            />
-          ) : (
-            <div className="h-[40vh] bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
-          )}
-        </div>
-        {vehicle.image_credit && (
-          <p className="mt-2 text-xs text-white/30">{vehicle.image_credit}</p>
-        )}
-      </Reveal>
+        <article className="relative mt-8 border-2 border-ink bg-bone p-5 text-ink shadow-[8px_8px_0_#0b1a16] md:p-10">
+          <span className="absolute -top-3 left-1/2 h-5 w-24 -translate-x-1/2 -rotate-2 bg-mustard/80" />
 
-      <Reveal delay={0.1}>
-        <p className="mt-10 text-sm tracking-[0.3em] text-cyan-300">
-          {vehicle.type.toUpperCase()} · {vehicle.year}
-        </p>
-        <h1 className="mt-2 text-[clamp(2rem,7vw,5rem)] font-bold leading-none">
-          {vehicle.name}
-        </h1>
-      </Reveal>
-
-      <Reveal delay={0.15}>
-        <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {facts.map((f) => (
-            <div
-              key={f.label}
-              className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"
-            >
-              <p className="text-xs uppercase tracking-widest text-white/40">
-                {f.label}
-              </p>
-              <p className="mt-1 text-lg font-semibold">{f.value}</p>
-            </div>
-          ))}
-        </div>
-      </Reveal>
-
-      {vehicle.story && (
-        <Reveal delay={0.2}>
-          <p className="mt-10 max-w-2xl text-[clamp(1.05rem,2vw,1.35rem)] leading-relaxed text-white/70">
-            {vehicle.story}
-          </p>
-        </Reveal>
-      )}
-
-      {related.length > 0 && (
-        <section className="mt-20">
-          <Reveal>
-            <h2 className="mb-6 text-2xl font-semibold">
-              More {vehicle.type.toLowerCase()}s from a similar time
-            </h2>
-          </Reveal>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
-            {related.map((v, i) => (
-              <Reveal key={v.id} delay={i * 0.1}>
-                <Link
-                  href={`/vehicles/${slugify(v.name)}`}
-                  className="block rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition hover:-translate-y-1 hover:border-cyan-300/50"
-                >
-                  <p className="text-sm text-cyan-300">{v.year}</p>
-                  <p className="mt-1 font-semibold">{v.name}</p>
-                  <p className="text-sm text-white/50">{v.country}</p>
-                </Link>
-              </Reveal>
-            ))}
+          {/* photo print */}
+          <div className="-rotate-1">
+            {vehicle.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={vehicle.image_url}
+                alt={vehicle.name}
+                className="max-h-[65vh] w-full border-[10px] border-white object-cover"
+              />
+            ) : (
+              <div className="flex h-64 w-full items-center justify-center border-[10px] border-white bg-chrome/50 text-ink/60">
+                No photo yet
+              </div>
+            )}
           </div>
-        </section>
-      )}
+          {vehicle.image_credit && (
+            <p className="mt-3 text-xs text-ink/50">{vehicle.image_credit}</p>
+          )}
+
+          <div className="mt-8 flex items-center gap-3">
+            <span className="border-2 border-ink bg-mustard px-3 py-1 font-display text-2xl leading-none">
+              {vehicle.year}
+            </span>
+            <span className="text-lg font-bold">{vehicle.type}</span>
+          </div>
+
+          <h1 className="mt-4 font-display text-[clamp(2rem,6vw,4rem)] leading-none">
+            {vehicle.name}
+          </h1>
+
+          <table className="mt-8 w-full border-collapse border-2 border-ink text-left">
+            <tbody>
+              {facts.map((f) => (
+                <tr key={f.label} className="border-b-2 border-ink last:border-b-0">
+                  <th
+                    scope="row"
+                    className="w-1/3 border-r-2 border-ink bg-mustard/60 px-4 py-2 font-bold"
+                  >
+                    {f.label}
+                  </th>
+                  <td className="px-4 py-2">{f.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {vehicle.story && (
+            <p className="mt-8 max-w-prose text-lg leading-relaxed">
+              {vehicle.story}
+            </p>
+          )}
+
+          {related.length > 0 && (
+            <section className="mt-12 border-t-2 border-dashed border-ink/40 pt-8">
+              <h2 className="font-display text-2xl">
+                More {vehicle.type.toLowerCase()}s from around {vehicle.year}
+              </h2>
+              <div className="mt-5 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+                {related.map((v) => (
+                  <Link
+                    key={v.id}
+                    href={`/vehicles/${slugify(v.name)}`}
+                    className="block border-2 border-ink bg-bone p-3 shadow-[4px_4px_0_#0b1a16] transition-transform hover:-translate-y-1 hover:bg-mustard/30"
+                  >
+                    <span className="border-2 border-ink bg-mustard px-2 py-0.5 font-display leading-none">
+                      {v.year}
+                    </span>
+                    <p className="mt-3 font-bold leading-snug">{v.name}</p>
+                    <p className="text-sm text-ink/70">{v.country}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </article>
+      </div>
     </main>
   );
 }

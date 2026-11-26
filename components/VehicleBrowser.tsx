@@ -86,14 +86,20 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
     .map((id) => vehicles.find((v) => v.id === id))
     .filter((v): v is Vehicle => Boolean(v));
 
+  const tabClass = (active: boolean) =>
+    `border-2 border-ink px-4 py-1.5 text-sm font-bold transition-colors ${
+      active ? "bg-enamel text-bone" : "bg-bone text-ink hover:bg-mustard/50"
+    }`;
+
   return (
     <section className="mx-auto max-w-6xl px-6 pb-40">
-      <div className="sticky top-4 z-40 mb-8 flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur-xl md:flex-row md:items-center">
+      {/* Tool tray: search and filters */}
+      <div className="sticky top-4 z-40 mb-10 flex flex-col gap-4 border-2 border-ink bg-bone p-4 text-ink shadow-[6px_6px_0_#0b1a16] md:flex-row md:items-center">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search name, country or year..."
-          className="w-full flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-white/40 outline-none transition focus:border-cyan-300/60"
+          placeholder="Search by name, country or year"
+          className="w-full flex-1 border-b-2 border-ink bg-transparent px-1 py-2 text-ink outline-none placeholder:text-ink/50 focus:border-enamel"
         />
 
         <div className="flex flex-wrap gap-2">
@@ -101,22 +107,14 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
             <button
               key={t}
               onClick={() => setType(t)}
-              className={`rounded-full px-4 py-2 text-sm transition ${
-                type === t
-                  ? "bg-cyan-400 text-black"
-                  : "bg-white/5 text-white/70 hover:bg-white/10"
-              }`}
+              className={tabClass(type === t)}
             >
               {t === "All" ? "All" : `${t}s`}
             </button>
           ))}
           <button
             onClick={() => setOnlyFavs((v) => !v)}
-            className={`rounded-full px-4 py-2 text-sm transition ${
-              onlyFavs
-                ? "bg-pink-500 text-white"
-                : "bg-white/5 text-white/70 hover:bg-white/10"
-            }`}
+            className={tabClass(onlyFavs)}
           >
             ♥ Favorites ({favCount})
           </button>
@@ -125,7 +123,7 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
         <select
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          className="rounded-xl border border-white/10 bg-[#0b0d14] px-4 py-3 text-white outline-none"
+          className="border-2 border-ink bg-bone px-3 py-2 font-bold text-ink outline-none"
         >
           {countries.map((c) => (
             <option key={c} value={c}>
@@ -135,40 +133,44 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
         </select>
       </div>
 
-      <p className="mb-6 text-sm text-white/50">
+      <p className="mb-8 text-bone/80">
         Showing {filtered.length} of {vehicles.length} vehicles
       </p>
 
       <motion.div
         layout
-        className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6"
+        className="grid grid-cols-[repeat(auto-fill,minmax(270px,1fr))] gap-x-8 gap-y-10"
       >
         <AnimatePresence mode="popLayout">
           {filtered.map((v) => {
             const isFav = favorites.includes(v.id);
             const isCmp = compareIds.includes(v.id);
+            // each card sits a little crooked, like pinned paper
+            const tilt = (((v.id * 37) % 7) - 3) * 0.5;
+
             return (
               <motion.div
                 key={v.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                whileHover={{ y: -8 }}
-                transition={{ type: "spring", stiffness: 260, damping: 30 }}
-                className={`relative rounded-2xl border bg-white/5 backdrop-blur hover:border-cyan-300/50 ${
-                  isCmp ? "border-cyan-300" : "border-white/10"
+                initial={{ opacity: 0, scale: 0.92, rotate: tilt }}
+                animate={{ opacity: 1, scale: 1, rotate: tilt }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                whileHover={{ rotate: 0, y: -6 }}
+                transition={{ type: "spring", stiffness: 260, damping: 26 }}
+                className={`relative border-2 border-ink bg-bone p-3 pb-5 text-ink shadow-[6px_6px_0_#0b1a16] ${
+                  isCmp ? "ring-4 ring-mustard" : ""
                 }`}
               >
-                <div className="absolute right-9 top-9 z-10 flex gap-2">
+                {/* piece of tape */}
+                <span className="absolute -top-3 left-1/2 h-5 w-20 -translate-x-1/2 -rotate-2 bg-mustard/80" />
+
+                <div className="absolute right-6 top-6 z-10 flex gap-2">
                   <button
                     onClick={() => toggleFav(v.id)}
                     aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
                     title="Favorite"
-                    className={`flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition ${
-                      isFav
-                        ? "bg-pink-500 text-white"
-                        : "bg-black/50 text-white/80 hover:bg-black/70"
+                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink ${
+                      isFav ? "bg-enamel text-bone" : "bg-bone text-ink"
                     }`}
                   >
                     {isFav ? "♥" : "♡"}
@@ -177,10 +179,8 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
                     onClick={() => toggleCompare(v.id)}
                     aria-label="Compare"
                     title="Compare"
-                    className={`flex h-9 w-9 items-center justify-center rounded-full backdrop-blur transition ${
-                      isCmp
-                        ? "bg-cyan-400 text-black"
-                        : "bg-black/50 text-white/80 hover:bg-black/70"
+                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink ${
+                      isCmp ? "bg-mustard text-ink" : "bg-bone text-ink"
                     }`}
                   >
                     ⇄
@@ -189,33 +189,48 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
 
                 <Link
                   href={`/vehicles/${slugify(v.name)}`}
-                  className="block cursor-pointer p-6"
+                  className="block cursor-pointer focus-visible:outline-4 focus-visible:outline-mustard"
                 >
+                  {/* photo print */}
                   {v.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={v.image_url}
                       alt={v.name}
                       loading="lazy"
-                      className="mb-6 h-40 w-full rounded-xl object-cover"
+                      className="h-44 w-full border-4 border-white object-cover"
                     />
                   ) : (
-                    <div className="mb-6 h-40 rounded-xl bg-gradient-to-br from-cyan-500/30 to-fuchsia-500/30" />
+                    <div className="flex h-44 w-full items-center justify-center border-4 border-white bg-chrome/50 text-ink/60">
+                      No photo yet
+                    </div>
                   )}
-                  <p className="text-sm text-cyan-300">
-                    {v.type} · {v.year}
-                  </p>
-                  <h3 className="mt-1 text-xl font-semibold">{v.name}</h3>
-                  <p className="text-white/50">{v.country}</p>
+
+                  <div className="mt-4 flex items-center gap-3">
+                    <span className="border-2 border-ink bg-mustard px-2 py-0.5 font-display text-lg leading-none">
+                      {v.year}
+                    </span>
+                    <span className="font-bold">{v.type}</span>
+                  </div>
+
+                  <h3 className="mt-3 font-display text-2xl leading-tight">
+                    {v.name}
+                  </h3>
+                  <p className="text-sm text-ink/70">{v.country}</p>
+
                   {v.story && (
-                    <p className="mt-3 text-sm leading-relaxed text-white/60">
-                      {v.story}
+                    <p className="mt-3 leading-relaxed">{v.story}</p>
+                  )}
+
+                  {v.image_credit && (
+                    <p className="mt-4 border-t border-dashed border-ink/30 pt-2 text-[0.7rem] leading-snug text-ink/50">
+                      {v.image_credit}
                     </p>
                   )}
-                  {v.image_credit && (
-                    <p className="mt-3 text-xs text-white/30">{v.image_credit}</p>
-                  )}
-                  <p className="mt-4 text-sm text-cyan-300">View details →</p>
+
+                  <p className="mt-3 font-bold text-enamel underline underline-offset-4">
+                    Read the full card
+                  </p>
                 </Link>
               </motion.div>
             );
@@ -224,14 +239,14 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
       </motion.div>
 
       {filtered.length === 0 && (
-        <p className="py-20 text-center text-white/50">
+        <p className="py-20 text-center text-bone/80">
           {onlyFavs && favCount === 0
-            ? "No favorites yet. Tap the ♡ on any card."
-            : "No vehicles found. Try another search."}
+            ? "No favorites yet. Tap the heart on any card."
+            : "Nothing matches your search. Try fewer words."}
         </p>
       )}
 
-      {/* Compare bar at the bottom */}
+      {/* Compare bar */}
       <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
         <AnimatePresence>
           {picked.length > 0 && (
@@ -240,14 +255,14 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="pointer-events-auto flex w-full max-w-xl flex-wrap items-center gap-3 rounded-2xl border border-white/10 bg-black/60 p-3 backdrop-blur-xl"
+              className="pointer-events-auto flex w-full max-w-xl flex-wrap items-center gap-3 border-2 border-ink bg-bone p-3 text-ink shadow-[6px_6px_0_#0b1a16]"
             >
               <div className="flex flex-1 flex-wrap gap-2">
                 {picked.map((v) => (
                   <button
                     key={v.id}
                     onClick={() => toggleCompare(v.id)}
-                    className="rounded-full bg-white/10 px-3 py-1 text-sm hover:bg-white/20"
+                    className="border-2 border-ink px-2 py-0.5 text-sm hover:bg-mustard/50"
                   >
                     {v.name} ✕
                   </button>
@@ -256,16 +271,16 @@ export default function VehicleBrowser({ vehicles }: { vehicles: Vehicle[] }) {
               {picked.length === 2 ? (
                 <button
                   onClick={() => setShowCompare(true)}
-                  className="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-black"
+                  className="border-2 border-ink bg-enamel px-4 py-2 font-bold text-bone"
                 >
                   Compare now
                 </button>
               ) : (
-                <span className="text-sm text-white/50">Pick one more</span>
+                <span className="text-sm text-ink/60">Pick one more</span>
               )}
               <button
                 onClick={() => setCompareIds([])}
-                className="text-sm text-white/50 hover:text-white"
+                className="text-sm text-ink/60 underline hover:text-ink"
               >
                 Clear
               </button>

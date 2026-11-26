@@ -54,36 +54,40 @@ export default function GarageChat() {
     <>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-24 right-4 z-40 rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-black shadow-lg md:bottom-6 md:right-6"
+        aria-expanded={open}
+        className="fixed bottom-24 right-4 z-40 border-2 border-ink bg-enamel px-5 py-3 font-bold text-bone shadow-[4px_4px_0_#0b1a16] focus-visible:outline-4 focus-visible:outline-mustard md:bottom-6 md:right-6"
       >
-        {open ? "Close" : "💬 Ask the Garage"}
+        {open ? "Close the chat" : "Ask the Garage"}
       </button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 30, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 30, scale: 0.96 }}
+            role="dialog"
+            aria-label="Ask the Garage"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
             transition={{ type: "spring", stiffness: 260, damping: 28 }}
-            className="fixed bottom-40 right-4 z-40 flex h-[min(70vh,520px)] w-[min(92vw,380px)] flex-col rounded-3xl border border-white/10 bg-[#0b0d14]/95 backdrop-blur-xl md:bottom-24 md:right-6"
+            className="fixed bottom-40 right-4 z-40 flex h-[min(70vh,520px)] w-[min(92vw,380px)] flex-col border-2 border-ink bg-bone text-ink shadow-[8px_8px_0_#0b1a16] md:bottom-24 md:right-6"
           >
-            <div className="border-b border-white/10 px-5 py-4">
-              <p className="font-semibold">Ask the Garage 🚗🏍️</p>
-              <p className="text-xs text-white/50">
-                Answers come only from this website&apos;s database.
+            <div className="border-b-2 border-ink bg-enamel px-5 py-3 text-bone">
+              <p className="font-display text-xl">Ask the Garage</p>
+              <p className="text-xs">
+                Answers come from the cards on this site. AI can make mistakes,
+                so check the card.
               </p>
             </div>
 
             <div data-lenis-prevent className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
               {msgs.length === 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm text-white/60">Try one of these:</p>
+                  <p className="text-sm text-ink/70">Try one of these:</p>
                   {EXAMPLES.map((ex) => (
                     <button
                       key={ex}
                       onClick={() => ask(ex)}
-                      className="block w-full rounded-xl bg-white/5 px-3 py-2 text-left text-sm text-white/80 hover:bg-white/10"
+                      className="block w-full border-2 border-ink bg-white px-3 py-2 text-left text-sm hover:bg-mustard/40"
                     >
                       {ex}
                     </button>
@@ -97,10 +101,8 @@ export default function GarageChat() {
                   className={m.role === "user" ? "flex justify-end" : "flex justify-start"}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                      m.role === "user"
-                        ? "bg-cyan-400 text-black"
-                        : "bg-white/10 text-white/90"
+                    className={`max-w-[85%] border-2 border-ink px-3 py-2 text-sm ${
+                      m.role === "user" ? "bg-mustard" : "bg-white"
                     }`}
                   >
                     <p className="whitespace-pre-wrap">{m.text}</p>
@@ -110,9 +112,9 @@ export default function GarageChat() {
                           <Link
                             key={v.slug}
                             href={`/vehicles/${v.slug}`}
-                            className="rounded-full bg-black/30 px-3 py-1 text-xs text-cyan-300 hover:bg-black/50"
+                            className="border-2 border-ink bg-bone px-2 py-0.5 text-xs font-bold text-enamel hover:bg-mustard/50"
                           >
-                            {v.name} →
+                            {v.name}
                           </Link>
                         ))}
                       </div>
@@ -121,11 +123,11 @@ export default function GarageChat() {
                 </div>
               ))}
 
-              {loading && <p className="text-sm text-white/50">Thinking...</p>}
+              {loading && <p className="text-sm text-ink/60">Checking the files...</p>}
               <div ref={endRef} />
             </div>
 
-            <div className="flex gap-2 border-t border-white/10 p-3">
+            <div className="flex gap-2 border-t-2 border-ink p-3">
               <input
                 value={input}
                 maxLength={200}
@@ -133,13 +135,13 @@ export default function GarageChat() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") ask(input);
                 }}
-                placeholder="Ask about a car or bike..."
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-cyan-300/60"
+                placeholder="Ask about a car or bike"
+                className="flex-1 border-2 border-ink bg-white px-3 py-2 text-sm text-ink outline-none placeholder:text-ink/50 focus:border-enamel"
               />
               <button
                 onClick={() => ask(input)}
                 disabled={loading}
-                className="rounded-xl bg-cyan-400 px-4 py-2 text-sm font-semibold text-black disabled:opacity-50"
+                className="border-2 border-ink bg-enamel px-4 py-2 text-sm font-bold text-bone disabled:opacity-50"
               >
                 Send
               </button>

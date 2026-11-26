@@ -1,4 +1,4 @@
-import Reveal from "../components/Reveal";
+import HangingSign from "../components/HangingSign";
 import VehicleBrowser from "../components/VehicleBrowser";
 import { supabase } from "../lib/supabase";
 import { cacheLife } from "next/cache";
@@ -14,25 +14,21 @@ export default async function Home() {
 
   return (
     <main>
-      <section className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-        <Reveal>
-          <p className="mb-4 text-sm tracking-[0.3em] text-cyan-300">
-            EVERY MACHINE. EVERY ERA.
-          </p>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <h1 className="text-[clamp(2.5rem,9vw,8rem)] font-bold leading-none">
-            Cars & Bikes World
-          </h1>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <p className="mx-auto mt-6 max-w-xl text-[clamp(1rem,2vw,1.25rem)] text-white/60">
-            A fluid journey through every car and bike ever made.
-          </p>
-        </Reveal>
+      <div className="h-3 w-full bg-chrome" />
+
+      <section className="px-6 pb-20">
+        <HangingSign />
+        <p className="mx-auto mt-10 max-w-md text-center text-lg leading-relaxed text-bone/90">
+          {vehicles.length} cars and bikes, filed by year. Search the shelves
+          below, or ask the garage.
+        </p>
       </section>
 
-      <VehicleBrowser vehicles={vehicles} />
+      <div className="checker" />
+
+      <div className="pt-12">
+        <VehicleBrowser vehicles={vehicles} />
+      </div>
     </main>
   );
 }
